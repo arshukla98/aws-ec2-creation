@@ -8,3 +8,12 @@ output "instance_public_ip" {
   value       = aws_instance.test-vm-2.public_ip
 }
 
+output "aws_security_group_name" {
+  description = "Name of the AWS Security Group"
+  value       = aws_security_group.new_security_group.name
+}
+
+output "aws_key_pair_name" {
+  description = "Name of the AWS Key Pair"
+  value       = aws_key_pair.example_key_pair.key_name
+}

@@ -20,7 +20,7 @@ on:
         required: true
 
 jobs:
-  createAndDestroy_ec2:
+  create_ec2_instance:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -53,3 +53,16 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -var name=${{ github.event.inputs.instanceName }} -var ami=${{ github.event.inputs.instanceImage }} -var instance_type=${{ github.event.inputs.instanceType }} -var region=${{ github.event.inputs.awsRegion }} -auto-approve
       working-directory: Terraform
+
+    - name: Terraform Output
+      run: |
+          mkdir -p Artifacts
+          terraform output | tee Artifacts/instance_info.txt
+      working-directory: Terraform
+
+    - name: Upload Instance Info
+      uses: actions/upload-artifact@v4
+      with:
+        name: InstanceInfo
+        path: Terraform/Artifacts
+        retention-days: 1
