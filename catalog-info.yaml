@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "aws-ec2-creation"
+  annotations:
+    github.com/project-slug: arshukla98/aws-ec2-creation
+  description: create aws ec2 instance managed by Terraform
+spec:
+  type: service
+  owner: user:guest
+  lifecycle: experimental

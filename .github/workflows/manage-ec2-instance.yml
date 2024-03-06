@@ -1,0 +1,55 @@
+name: Manage EC2 Instance
+
+on:
+  workflow_dispatch:
+    inputs:
+      instanceName:
+        description: 'The Name of Instance'
+        required: true
+      instanceImage:
+        description: 'The OS of Instance'
+        required: true
+      instanceType:
+        description: 'The Type of the Instance'
+        required: true
+      awsRegion:
+        description: 'AWS Region for the cluster'
+        required: true
+      publicKey:
+        description: 'SSH Public Key'
+        required: true
+
+jobs:
+  createAndDestroy_ec2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Register Existing SSH Public key from backstage host
+      run: |
+          mkdir -p ~/.ssh/
+          echo "${{ github.event.inputs.publicKey }}" > ~/.ssh/id_rsa_1.pub
+          #chmod 600 ~/.ssh/id_rsa
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ github.event.inputs.awsRegion }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: Terraform
+
+    - name: Terraform Format
+      run: terraform fmt
+      working-directory: Terraform
+
+    - name: Terraform Apply
+      run: terraform apply -var name=${{ github.event.inputs.instanceName }} -var ami=${{ github.event.inputs.instanceImage }} -var instance_type=${{ github.event.inputs.instanceType }} -var region=${{ github.event.inputs.awsRegion }} -auto-approve
+      working-directory: Terraform
