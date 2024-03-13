@@ -34,6 +34,13 @@ resource "aws_security_group" "new_security_group" {
     cidr_blocks = var.ssh_ingress_cidr_blocks
   }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"  # All Traffic
+    cidr_blocks = var.ssh_ingress_cidr_blocks
+  }
+
   # You can add more ingress rules as needed for your application
 }
 
