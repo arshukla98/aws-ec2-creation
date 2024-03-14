@@ -1,0 +1,40 @@
+name: Stop EC2 Instance
+
+on:
+  workflow_dispatch:
+    inputs:
+      instanceID:
+        description: 'The ID of EC2 Instance'
+        required: true
+      awsRegion:
+        description: 'AWS Region for the cluster'
+        required: true
+
+jobs:
+  create_ec2_instance:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ github.event.inputs.awsRegion }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: Terraform/Stop_Instance
+
+    - name: Terraform Format
+      run: terraform fmt
+      working-directory: Terraform/Stop_Instance
+
+    - name: Terraform Apply
+      run: terraform apply -var instanceID=${{ github.event.inputs.instanceID }} -var region=${{ github.event.inputs.awsRegion }} -auto-approve
+      working-directory: Terraform/Stop_Instance
