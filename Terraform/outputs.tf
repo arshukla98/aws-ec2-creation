@@ -8,6 +8,11 @@ output "instance_public_ip" {
   value       = aws_instance.test-vm-2.public_ip
 }
 
+output "instance_public_dns" {
+  description = "Public IPv4 DNS of the EC2 instance"
+  value       = aws_instance.test-vm-2.public_dns
+}
+
 output "aws_security_group_name" {
   description = "Name of the AWS Security Group"
   value       = aws_security_group.new_security_group.name
