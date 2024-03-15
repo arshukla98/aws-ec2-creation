@@ -1,4 +1,4 @@
-name: Stop EC2 Instance
+name: Manage EC2 Instance State
 
 on:
   workflow_dispatch:
@@ -9,9 +9,12 @@ on:
       awsRegion:
         description: 'AWS Region for the cluster'
         required: true
+      action:
+        description: 'Action to perform (start/stop/reboot)'
+        required: true
 
 jobs:
-  create_ec2_instance:
+  stop_ec2_instance:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -29,12 +32,12 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
-      working-directory: Terraform/Stop_Instance
+      working-directory: Terraform/changeEC2State
 
     - name: Terraform Format
       run: terraform fmt
-      working-directory: Terraform/Stop_Instance
+      working-directory: Terraform/changeEC2State
 
     - name: Terraform Apply
-      run: terraform apply -var instanceID=${{ github.event.inputs.instanceID }} -var region=${{ github.event.inputs.awsRegion }} -var ami=${{ github.event.inputs.instanceImage }} -var instance_type=${{ github.event.inputs.instanceType }} -auto-approve
-      working-directory: Terraform/Stop_Instance
+      run: terraform apply -var instance_id=${{ github.event.inputs.instanceID }} -var action=${{ github.event.inputs.action }} -auto-approve
+      working-directory: Terraform/changeEC2State
