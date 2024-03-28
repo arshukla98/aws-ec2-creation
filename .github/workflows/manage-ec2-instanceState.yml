@@ -38,6 +38,12 @@ jobs:
       run: terraform fmt
       working-directory: Terraform/changeEC2State
 
+    - name: Fetch instanceID
+      id: get-instanceid
+      run: |
+          instanceID=$(echo ${{ github.event.inputs.instanceID }} | cut -d ':' -f 1)
+          echo "instance_id_number=$instanceID" >> "$GITHUB_OUTPUT"
+
     - name: Terraform Apply
-      run: terraform apply -var instance_id=${{ github.event.inputs.instanceID }} -var action=${{ github.event.inputs.action }} -auto-approve
+      run: terraform apply -var instance_id=${{ steps.get-instanceid.outputs.instance_id_number }} -var action=${{ github.event.inputs.action }} -auto-approve
       working-directory: Terraform/changeEC2State
